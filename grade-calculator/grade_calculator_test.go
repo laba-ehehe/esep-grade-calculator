@@ -49,3 +49,63 @@ func TestGetGradeF(t *testing.T) {
 		t.Errorf("Expected GetGrade to return '%s'; got '%s' instead", expected_value, actual_value)
 	}
 }
+
+func TestGetGradeC(t *testing.T) {
+	calculator := NewGradeCalculator()
+	calculator.AddGrade("Assignment", 70, Assignment)
+	calculator.AddGrade("Exam", 70, Exam)
+	calculator.AddGrade("Essay", 70, Essay)
+
+	if actual := calculator.GetFinalGrade(); actual != "C" {
+		t.Errorf("Expected C; got %s", actual)
+	}
+}
+
+func TestGetGradeD(t *testing.T) {
+	calculator := NewGradeCalculator()
+	calculator.AddGrade("Assignment", 60, Assignment)
+	calculator.AddGrade("Exam", 60, Exam)
+	calculator.AddGrade("Essay", 60, Essay)
+
+	if actual := calculator.GetFinalGrade(); actual != "D" {
+		t.Errorf("Expected D; got %s", actual)
+	}
+}
+
+func TestGradeTypeString(t *testing.T) {
+	cases := []struct {
+		gradeType GradeType
+		expected  string
+	}{
+		{Assignment, "assignment"},
+		{Exam, "exam"},
+		{Essay, "essay"},
+	}
+
+	for _, tc := range cases {
+		if actual := tc.gradeType.String(); actual != tc.expected {
+			t.Errorf("Expected %s; got %s", tc.expected, actual)
+		}
+	}
+}
+
+func TestMultipleGradesAndWeights(t *testing.T) {
+	calculator := NewGradeCalculator()
+
+	// Assignment average = 90.
+	calculator.AddGrade("Assignment 1", 80, Assignment)
+	calculator.AddGrade("Assignment 2", 100, Assignment)
+
+	// Exam average = 60.
+	calculator.AddGrade("Exam 1", 50, Exam)
+	calculator.AddGrade("Exam 2", 70, Exam)
+
+	// Essay average = 100.
+	calculator.AddGrade("Essay 1", 100, Essay)
+	calculator.AddGrade("Essay 2", 100, Essay)
+
+	// Weighted score = 90(0.50) + 60(0.35) + 100(0.15) = 81.
+	if actual := calculator.GetFinalGrade(); actual != "B" {
+		t.Errorf("Expected B; got %s", actual)
+	}
+}
