@@ -109,3 +109,48 @@ func TestMultipleGradesAndWeights(t *testing.T) {
 		t.Errorf("Expected B; got %s", actual)
 	}
 }
+
+func TestPassFailEvaluation(t *testing.T) {
+	cases := []struct {
+		name     string
+		score    int
+		expected string
+	}{
+		{"A passes", 95, "Pass"},
+		{"B passes", 85, "Pass"},
+		{"C boundary passes", 70, "Pass"},
+		{"Below C fails", 69, "Fail"},
+		{"D fails", 60, "Fail"},
+		{"F fails", 50, "Fail"},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			calculator := NewGradeCalculator(PassFail)
+
+			calculator.AddGrade("Assignment", tc.score, Assignment)
+			calculator.AddGrade("Exam", tc.score, Exam)
+			calculator.AddGrade("Essay", tc.score, Essay)
+
+			actual := calculator.GetFinalGrade()
+
+			if actual != tc.expected {
+				t.Errorf("Expected %s; got %s", tc.expected, actual)
+			}
+		})
+	}
+}
+
+func TestExplicitLetterGradeMode(t *testing.T) {
+	calculator := NewGradeCalculator(LetterGrade)
+
+	calculator.AddGrade("Assignment", 85, Assignment)
+	calculator.AddGrade("Exam", 85, Exam)
+	calculator.AddGrade("Essay", 85, Essay)
+
+	actual := calculator.GetFinalGrade()
+
+	if actual != "B" {
+		t.Errorf("Expected B; got %s", actual)
+	}
+}
